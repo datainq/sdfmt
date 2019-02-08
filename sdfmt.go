@@ -111,7 +111,6 @@ func toProtoStruct(v interface{}) (*structpb.Struct, error) {
 }
 
 func toLogEntry(e logging.Entry) (*logpb.LogEntry, error) {
-	// ...
 	t := e.Timestamp
 	if t.IsZero() {
 		t = time.Now().UTC()
@@ -120,12 +119,10 @@ func toLogEntry(e logging.Entry) (*logpb.LogEntry, error) {
 	if err != nil {
 		return nil, err
 	}
-	// ...
 	ent := &logpb.LogEntry{
-		Timestamp: ts,
-		Severity:  logtypepb.LogSeverity(e.Severity),
-		InsertId:  e.InsertID,
-		// ...
+		Timestamp:      ts,
+		Severity:       logtypepb.LogSeverity(e.Severity),
+		InsertId:       e.InsertID,
 		Operation:      e.Operation,
 		Labels:         e.Labels,
 		Trace:          e.Trace,
