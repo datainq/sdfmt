@@ -8,7 +8,7 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-type StackdriverFormatter struct{}
+type StackdriverFormatter struct{} // TODO(amw): make logEntry fields more configurable.
 
 func (s StackdriverFormatter) Format(entry *logrus.Entry) ([]byte, error) {
 	le := logEntry{
@@ -40,7 +40,14 @@ func (s StackdriverFormatter) Format(entry *logrus.Entry) ([]byte, error) {
 		le.Labels[k] = fmt.Sprintf("%v", v)
 	}
 
-	return json.Marshal(le)
+	b, err := json.Marshal(le)
+	if err != nil {
+		return nil, err
+	}
+
+	b = append(b, '\n')
+
+	return b, nil
 }
 
 type logSeverity int

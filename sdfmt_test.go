@@ -2,6 +2,7 @@ package sdfmt
 
 import (
 	"bytes"
+	"fmt"
 	"testing"
 
 	"github.com/magiconair/properties/assert"
@@ -25,5 +26,5 @@ func TestStackdriverFormatter_Format(t *testing.T) {
 		"number": 122,
 	}).Warn("The group's number increased tremendously!")
 
-	assert.Equal(t, buf.String()[206:], `400,"labels":{"number":"122","omg":"true"},"textPayload":"The group's number increased tremendously!"}`)
+	assert.Equal(t, buf.String()[207:], fmt.Sprintln(`400,"labels":{"number":"122","omg":"true"},"textPayload":"The group's number increased tremendously!"}`))
 }
