@@ -1,16 +1,19 @@
 package sdfmt
 
 import (
-	"os"
+	"bytes"
 	"testing"
 
+	"github.com/magiconair/properties/assert"
 	"github.com/sirupsen/logrus"
 )
 
 func TestStackdriverFormatter_Format(t *testing.T) {
 	log := logrus.New()
-	log.SetOutput(os.Stderr)
 	log.SetFormatter(&StackdriverFormatter{})
+
+	var buf bytes.Buffer
+	log.SetOutput(&buf)
 
 	log.WithFields(logrus.Fields{
 		"animal": "walrus",
@@ -22,18 +25,5 @@ func TestStackdriverFormatter_Format(t *testing.T) {
 		"number": 122,
 	}).Warn("The group's number increased tremendously!")
 
-	log.WithFields(logrus.Fields{
-		"omg":    true,
-		"number": 100,
-	}).Fatal("The ice breaks!")
-
-	// A common pattern is to re-use fields between logging statements by re-using
-	// the logrus.Entry returned from WithFields()
-	contextLogger := log.WithFields(logrus.Fields{
-		"common": "this is a common field",
-		"other":  "I also should be logged always",
-	})
-
-	contextLogger.Info("I'll be logged with common and other field")
-	contextLogger.Info("Me too")
+	assert.Equal(t, buf.String()[206:], `400,"labels":{"number":"122","omg":"true"},"textPayload":"The group's number increased tremendously!"}`)
 }
