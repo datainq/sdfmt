@@ -8,13 +8,13 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-type StackdriverFormatter struct{} // TODO(amw): make logEntry fields more configurable.
+type StackdriverFormatter struct{}
 
 func (s StackdriverFormatter) Format(entry *logrus.Entry) ([]byte, error) {
 	le := logEntry{
-		Timestamp:   entry.Time.Format(time.RFC3339),
-		Labels:      make(map[string]string),
-		TextPayload: entry.Message,
+		Labels:    make(map[string]string),
+		Message:   entry.Message,
+		Timestamp: entry.Time.Format(time.RFC3339Nano),
 	}
 
 	switch entry.Level {
@@ -40,14 +40,8 @@ func (s StackdriverFormatter) Format(entry *logrus.Entry) ([]byte, error) {
 		le.Labels[k] = fmt.Sprintf("%v", v)
 	}
 
-	b, err := json.Marshal(le)
-	if err != nil {
-		return nil, err
-	}
-
-	b = append(b, '\n')
-
-	return b, nil
+	data, err := json.Marshal(le)
+	return append(data, '\n'), err
 }
 
 type logSeverity int
@@ -65,22 +59,8 @@ const (
 )
 
 type logEntry struct {
-	LogName      string            `json:"logName,omitempty"`
-	Timestamp    string            `json:"timestamp,omitempty"`
-	Severity     logSeverity       `json:"severity,omitempty"`
-	InsertID     string            `json:"insertId,omitempty"`
-	Labels       map[string]string `json:"labels,omitempty"`
-	Trace        string            `json:"trace,omitempty"`
-	SpanID       string            `json:"spanId,omitempty"`
-	TraceSampled bool              `json:"traceSampled,omitempty"`
-	// TODO(amw): resource, httpRequest, operation, sourceLocation.
-
-	// receiveTimestamp & metadata are output only.
-
-	ProtoPayload interface{}     `json:"protoPayload,omitempty"`
-	TextPayload  string          `json:"textPayload,omitempty"`
-	JsonPayload  json.RawMessage `json:"jsonPayload,omitempty"`
-
-	// All fields according to
-	// https://cloud.google.com/logging/docs/reference/v2/rest/v2/LogEntry.
+	Labels    map[string]string `json:"labels,omitempty"`
+	Message   string            `json:"message,omitempty"`
+	Severity  logSeverity       `json:"severity,omitempty"`
+	Timestamp string            `json:"timestamp,omitempty"`
 }
