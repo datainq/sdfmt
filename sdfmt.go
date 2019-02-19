@@ -19,21 +19,21 @@ func (s StackdriverFormatter) Format(entry *logrus.Entry) ([]byte, error) {
 
 	switch entry.Level {
 	case logrus.PanicLevel:
-		le.Severity = _alert
+		le.Severity = _emergency
 	case logrus.FatalLevel:
-		le.Severity = _alert
+		le.Severity = _emergency
 	case logrus.ErrorLevel:
-		le.Severity = _critical
+		le.Severity = _error
 	case logrus.WarnLevel:
 		le.Severity = _warning
 	case logrus.InfoLevel:
-		le.Severity = _notice
-	case logrus.DebugLevel:
 		le.Severity = _info
+	case logrus.DebugLevel:
+		le.Severity = _debug
 	case logrus.TraceLevel:
 		le.Severity = _debug
 	default:
-		le.Severity = _default
+		le.Severity = _alert
 	}
 
 	for k, v := range entry.Data {
